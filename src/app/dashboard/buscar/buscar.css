@@ -352,3 +352,165 @@
     font-size: 2.5rem;
   }
 }
+
+/* Modal Estilos de Detalle (Hotel y Atracción) */
+.detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+  padding: 24px;
+}
+
+.detail-modal-card {
+  background: #FFFFFF;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.detail-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--foreground);
+  transition: all 0.2s;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+.detail-modal-close:hover {
+  background: #FFFFFF;
+  transform: scale(1.05);
+  color: var(--accent);
+}
+
+.detail-modal-hero {
+  height: 240px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.detail-modal-hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+  color: #FFFFFF;
+}
+
+.detail-modal-hero-overlay h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  margin: 0;
+}
+
+.detail-modal-body {
+  padding: 32px;
+}
+
+.detail-modal-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.detail-modal-description {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.detail-modal-section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--foreground);
+}
+
+.detail-modal-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.detail-modal-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--foreground);
+  background: rgba(0, 0, 0, 0.02);
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+
+.detail-modal-tips {
+  background: #FFF9F9;
+  border: 1px dashed rgba(255, 90, 95, 0.25);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.detail-modal-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-modal-tips li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

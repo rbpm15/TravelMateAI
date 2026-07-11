@@ -37,6 +37,7 @@ function BuscarViajeContent() {
   const [error, setError] = useState(null);
   const [guardado, setGuardado] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [activeModalItem, setActiveModalItem] = useState(null);
 
   // Leer parámetros de búsqueda al cargar de forma dinámica (incluyendo fechas y localStorage)
   useEffect(() => {
@@ -194,7 +195,6 @@ function BuscarViajeContent() {
     <div className="buscar-container">
       {!resultados ? (
         <div className="form-wrapper slide-in-up">
-          <Link href="/dashboard" className="btn-back">← Volver al Panel</Link>
           <h1>Planear Nuevo Viaje</h1>
           <p>Configura tu viaje y nuestra IA encontrará las mejores opciones.</p>
 
@@ -372,7 +372,16 @@ function BuscarViajeContent() {
               {resultados.hoteles.length > 0 ? (
                 <div className="places-list">
                   {resultados.hoteles.map((h, i) => (
-                    <div key={i} className="place-item-card">
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      onClick={() => setActiveModalItem({
+                        type: 'hotel',
+                        nombre: h.nombre,
+                        stars: h.stars || 4,
+                        imagen: HOTEL_IMAGES[i % HOTEL_IMAGES.length]
+                      })}
+                    >
                       <div 
                         className="place-img" 
                         style={{ backgroundImage: `url(${HOTEL_IMAGES[i % HOTEL_IMAGES.length]})` }}
@@ -396,7 +405,16 @@ function BuscarViajeContent() {
               {resultados.atracciones.length > 0 ? (
                 <div className="places-list">
                   {resultados.atracciones.map((a, i) => (
-                    <div key={i} className="place-item-card">
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      onClick={() => setActiveModalItem({
+                        type: 'attraction',
+                        nombre: a.nombre,
+                        category: a.tipo || "Atracción",
+                        imagen: ATTRACTION_IMAGES[i % ATTRACTION_IMAGES.length]
+                      })}
+                    >
                       <div 
                         className="place-img" 
                         style={{ backgroundImage: `url(${ATTRACTION_IMAGES[i % ATTRACTION_IMAGES.length]})` }}
@@ -437,7 +455,6 @@ function BuscarViajeContent() {
               ) : (
                 <button className="btn-primary" onClick={guardarViaje}>Guardar Viaje en Historial</button>
               )}
-              <Link href="/dashboard" className="btn-secondary">Volver al Dashboard</Link>
             </div>
             {saveError && (
               <div className="error-msg" style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -445,6 +462,69 @@ function BuscarViajeContent() {
                 <span>{saveError}</span>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalle */}
+      {activeModalItem && (
+        <div className="detail-modal-overlay" onClick={() => setActiveModalItem(null)}>
+          <div className="detail-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="detail-modal-close" onClick={() => setActiveModalItem(null)}>✕</button>
+            <div 
+              className="detail-modal-hero" 
+              style={{ backgroundImage: `url(${activeModalItem.imagen})` }}
+            >
+              <div className="detail-modal-hero-overlay">
+                <h2>{activeModalItem.nombre}</h2>
+              </div>
+            </div>
+            <div className="detail-modal-body">
+              <div className="detail-modal-meta">
+                {activeModalItem.type === 'hotel' ? (
+                  <>
+                    <span className="stars" style={{ fontSize: '1.2rem' }}>
+                      {"⭐".repeat(activeModalItem.stars || 4)}
+                    </span>
+                    <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
+                      Hospedaje Recomendado
+                    </span>
+                  </>
+                ) : (
+                  <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
+                    {activeModalItem.category || "Atracción Turística"}
+                  </span>
+                )}
+              </div>
+
+              <p className="detail-modal-description">
+                {activeModalItem.type === 'hotel' 
+                  ? `Este excelente hotel te ofrece una estancia cómoda con ubicaciones fantásticas, habitaciones bien equipadas y atención cálida. Disfruta del confort ideal mientras exploras tu destino.`
+                  : `Uno de los atractivos imperdibles y más recomendados de este destino. Un lugar rico en historia, cultura y hermosas vistas para capturar los mejores momentos de tu viaje.`
+                }
+              </p>
+
+              <h3 className="detail-modal-section-title" style={{ color: 'var(--foreground)' }}>
+                {activeModalItem.type === 'hotel' ? "✨ Servicios del Hotel" : "💡 Información Clave"}
+              </h3>
+
+              {activeModalItem.type === 'hotel' ? (
+                <div className="detail-modal-features">
+                  <div className="detail-modal-feature-item">📶 Wi-Fi Incluido</div>
+                  <div className="detail-modal-feature-item">🏊 Piscina / Spa</div>
+                  <div className="detail-modal-feature-item">🍳 Desayuno Completo</div>
+                  <div className="detail-modal-feature-item">🏋️ Gimnasio</div>
+                </div>
+              ) : (
+                <div className="detail-modal-tips">
+                  <ul>
+                    <li>🎟️ <strong>Reservas:</strong> Se sugiere reservar o comprar entradas online para evitar filas.</li>
+                    <li>👟 <strong>Ropa:</strong> Calzado y ropa cómodos recomendados para caminar.</li>
+                    <li>📸 <strong>Cámara:</strong> Permitido tomar fotos libres para uso personal.</li>
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
