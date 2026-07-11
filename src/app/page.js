@@ -37,6 +37,19 @@ const DESTINOS_RECOMENDADOS = [
   }
 ];
 
+const HOTEL_IMAGES = [
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=80"
+];
+
+const ATTRACTION_IMAGES = [
+  "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80"
+];
+
 export default function Home() {
   const router = useRouter();
   const [session, setSession] = useState(null);
@@ -344,18 +357,52 @@ export default function Home() {
             <div className="preview-locked-area">
               <div className="bento-card blurred">
                 <h3>🏨 Opciones de Hospedaje</h3>
-                <ul className="list-items">
-                  <li><strong>Hotel Grand Oasis Premium</strong> <span className="stars">(4★)</span></li>
-                  <li><strong>Central Station Hostel & Suites</strong> <span className="stars">(3★)</span></li>
-                </ul>
+                <div className="places-list">
+                  <div className="place-item-card">
+                    <div className="place-img" style={{ backgroundImage: `url(${HOTEL_IMAGES[0]})` }}></div>
+                    <div className="place-details">
+                      <span className="place-name">Hotel Grand Oasis Premium</span>
+                      <div className="place-meta">
+                        <span className="place-rating">⭐ 4 / 5</span>
+                        <span className="place-badge">Hospedaje</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="place-item-card">
+                    <div className="place-img" style={{ backgroundImage: `url(${HOTEL_IMAGES[1]})` }}></div>
+                    <div className="place-details">
+                      <span className="place-name">Central Station Hostel & Suites</span>
+                      <div className="place-meta">
+                        <span className="place-rating">⭐ 3 / 5</span>
+                        <span className="place-badge">Hospedaje</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="bento-card blurred">
                 <h3>📍 Lugares Turísticos</h3>
-                <ul className="list-items">
-                  <li><strong>Museo Nacional de Arte Histórico</strong></li>
-                  <li><strong>Templo Central e Iconografía</strong></li>
-                </ul>
+                <div className="places-list">
+                  <div className="place-item-card">
+                    <div className="place-img" style={{ backgroundImage: `url(${ATTRACTION_IMAGES[0]})` }}></div>
+                    <div className="place-details">
+                      <span className="place-name">Museo Nacional de Arte Histórico</span>
+                      <div className="place-meta">
+                        <span className="place-badge">Museo</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="place-item-card">
+                    <div className="place-img" style={{ backgroundImage: `url(${ATTRACTION_IMAGES[1]})` }}></div>
+                    <div className="place-details">
+                      <span className="place-name">Templo Central e Iconografía</span>
+                      <div className="place-meta">
+                        <span className="place-badge">Histórico</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="bento-card itinerary-card full-span blurred">

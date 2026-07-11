@@ -9,6 +9,20 @@ import "./historial.css";
 // Reutilizamos parte de los estilos de "buscar"
 import "../buscar/buscar.css";
 
+// Imágenes de alta calidad de Unsplash para dar ganas de viajar
+const HOTEL_IMAGES = [
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=80"
+];
+
+const ATTRACTION_IMAGES = [
+  "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80"
+];
+
 export default function Historial() {
   const [viajes, setViajes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -144,11 +158,23 @@ export default function Historial() {
             <div className="bento-card">
               <h3>🏨 Opciones de Hospedaje</h3>
               {selectedTrip.resultados?.hoteles?.length > 0 ? (
-                <ul className="list-items">
+                <div className="places-list">
                   {selectedTrip.resultados.hoteles.map((h, i) => (
-                    <li key={i}><strong>{h.nombre}</strong> <span className="stars">({h.stars}★)</span></li>
+                    <div key={i} className="place-item-card">
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${HOTEL_IMAGES[i % HOTEL_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{h.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-rating">⭐ {h.stars} / 5</span>
+                          <span className="place-badge">Hospedaje</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : <p>No se encontraron hoteles con nombre en esta área.</p>}
             </div>
 
@@ -156,11 +182,22 @@ export default function Historial() {
             <div className="bento-card">
               <h3>📍 Lugares Turísticos</h3>
               {selectedTrip.resultados?.atracciones?.length > 0 ? (
-                <ul className="list-items">
+                <div className="places-list">
                   {selectedTrip.resultados.atracciones.map((a, i) => (
-                    <li key={i}><strong>{a.nombre}</strong></li>
+                    <div key={i} className="place-item-card">
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${ATTRACTION_IMAGES[i % ATTRACTION_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{a.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-badge">{a.tipo || "Atracción"}</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : <p>No se encontraron atracciones destacadas.</p>}
             </div>
 

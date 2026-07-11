@@ -7,6 +7,20 @@ import { MapPin, Calendar, Users, Wallet, Check, AlertCircle } from "lucide-reac
 import "./buscar.css";
 import Link from "next/link";
 
+// Imágenes de alta calidad de Unsplash para dar ganas de viajar
+const HOTEL_IMAGES = [
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=80"
+];
+
+const ATTRACTION_IMAGES = [
+  "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80"
+];
+
 function BuscarViajeContent() {
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
@@ -22,6 +36,7 @@ function BuscarViajeContent() {
   const [resultados, setResultados] = useState(null);
   const [error, setError] = useState(null);
   const [guardado, setGuardado] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   // Leer parámetros de búsqueda al cargar de forma dinámica (incluyendo fechas y localStorage)
   useEffect(() => {
@@ -146,6 +161,7 @@ function BuscarViajeContent() {
 
   const guardarViaje = async () => {
     try {
+      setSaveError(null);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -166,6 +182,11 @@ function BuscarViajeContent() {
       setGuardado(true);
     } catch (err) {
       console.error("Error guardando viaje:", err.message || err);
+      if (err.message?.includes("public.consultas") || err.message?.includes("relation") || err.message?.includes("schema cache")) {
+        setSaveError("⚠️ La tabla 'consultas' no existe en tu base de datos de Supabase. Por favor ejecuta el script de SQL para crearla.");
+      } else {
+        setSaveError(`❌ Error al guardar: ${err.message || err}`);
+      }
     }
   };
 
@@ -349,11 +370,23 @@ function BuscarViajeContent() {
             <div className="bento-card slide-in-up delay-2">
               <h3>🏨 Opciones de Hospedaje</h3>
               {resultados.hoteles.length > 0 ? (
-                <ul className="list-items">
+                <div className="places-list">
                   {resultados.hoteles.map((h, i) => (
-                    <li key={i}><strong>{h.nombre}</strong> <span className="stars">({h.stars}★)</span></li>
+                    <div key={i} className="place-item-card">
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${HOTEL_IMAGES[i % HOTEL_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{h.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-rating">⭐ {h.stars} / 5</span>
+                          <span className="place-badge">Hospedaje</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : <p>No se encontraron hoteles con nombre en esta área.</p>}
             </div>
 
@@ -361,11 +394,22 @@ function BuscarViajeContent() {
             <div className="bento-card slide-in-up delay-3">
               <h3>📍 Lugares Turísticos</h3>
               {resultados.atracciones.length > 0 ? (
-                <ul className="list-items">
+                <div className="places-list">
                   {resultados.atracciones.map((a, i) => (
-                    <li key={i}><strong>{a.nombre}</strong></li>
+                    <div key={i} className="place-item-card">
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${ATTRACTION_IMAGES[i % ATTRACTION_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{a.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-badge">{a.tipo || "Atracción"}</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : <p>No se encontraron atracciones destacadas.</p>}
             </div>
 
@@ -386,13 +430,21 @@ function BuscarViajeContent() {
             </div>
           </div>
 
-          <div className="action-bar">
-            {guardado ? (
-              <button className="btn-success" disabled><Check size={18} /> Viaje Guardado</button>
-            ) : (
-              <button className="btn-primary" onClick={guardarViaje}>Guardar Viaje en Historial</button>
+          <div className="action-bar-wrapper" style={{ marginTop: '24px' }}>
+            <div className="action-bar">
+              {guardado ? (
+                <button className="btn-success" disabled><Check size={18} /> Viaje Guardado</button>
+              ) : (
+                <button className="btn-primary" onClick={guardarViaje}>Guardar Viaje en Historial</button>
+              )}
+              <Link href="/dashboard" className="btn-secondary">Volver al Dashboard</Link>
+            </div>
+            {saveError && (
+              <div className="error-msg" style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertCircle size={18} />
+                <span>{saveError}</span>
+              </div>
             )}
-            <Link href="/dashboard" className="btn-secondary">Volver al Dashboard</Link>
           </div>
         </div>
       )}

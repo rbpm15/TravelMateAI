@@ -214,3 +214,85 @@ button {
 .budget-progress-fill.hotel { background: #FF5A5F; }
 .budget-progress-fill.food { background: #F59E0B; }
 .budget-progress-fill.transport { background: #8B5CF6; }
+
+/* Places & Hotels Curated Cards */
+.places-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.place-item-card {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--background);
+  border-radius: 18px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+}
+
+.place-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 166, 153, 0.08);
+  border-color: rgba(0, 166, 153, 0.15);
+  background: #FFFFFF;
+}
+
+.place-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.place-item-card:hover .place-img {
+  transform: scale(1.08);
+}
+
+.place-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.place-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.35;
+}
+
+.place-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.place-rating {
+  color: #FFB800;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.place-badge {
+  background: rgba(0, 166, 153, 0.08);
+  color: var(--accent-hover);
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
