@@ -119,19 +119,20 @@
   box-shadow: none;
 }
 
-.auth-links {
+.auth-card .auth-links {
+  margin-top: 24px;
   font-size: 0.95rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.auth-links a {
+.auth-card .auth-links a {
   color: var(--accent);
   font-weight: 700;
   margin-left: 4px;
 }
 
-.auth-links a:hover {
+.auth-card .auth-links a:hover {
   text-decoration: underline;
 }
 

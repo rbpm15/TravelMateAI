@@ -108,7 +108,7 @@ function ResetPasswordContent() {
           </button>
         </form>
 
-        <div className="auth-links" style={{ marginTop: "24px" }}>
+        <div className="auth-links">
           <Link href="/login" style={{ color: "var(--accent)", fontWeight: "700" }}>Volver a Iniciar Sesión</Link>
         </div>
       </div>
