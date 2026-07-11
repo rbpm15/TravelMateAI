@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { MapPin, Calendar, Users, Wallet, Check, AlertCircle } from "lucide-react";
+import { MapPin, Calendar, Users, Wallet, Check, AlertCircle, Plane } from "lucide-react";
 import "./buscar.css";
 import Link from "next/link";
 
@@ -87,6 +87,7 @@ function BuscarViajeContent() {
   const [error, setError] = useState(null);
   const [guardado, setGuardado] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [activeModalItem, setActiveModalItem] = useState(null);
 
   const ejecutarBusquedaAutomatica = async (datos) => {
@@ -129,6 +130,27 @@ function BuscarViajeContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % 5);
+      }, 2500);
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoadingStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  const loadingMessages = [
+    "Contactando a nuestra IA de viajes...",
+    "Buscando las mejores rutas de vuelo...",
+    "Analizando opciones de alojamiento reales...",
+    "Descubriendo restaurantes y atracciones locales...",
+    "Armando tu itinerario personalizado..."
+  ];
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -203,7 +225,20 @@ function BuscarViajeContent() {
 
   return (
     <div className="buscar-container">
-      {!resultados ? (
+      {loading ? (
+        <div className="form-wrapper slide-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', textAlign: 'center' }}>
+          <div className="ai-loader-spinner" style={{ marginBottom: '30px' }}>
+            <Plane size={48} color="var(--accent)" style={{ animation: 'fly-spin 3s linear infinite' }} />
+          </div>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Preparando la magia...</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', minHeight: '30px', transition: 'all 0.3s' }}>
+            {loadingMessages[loadingStep]}
+          </p>
+          <div style={{ width: '100%', maxWidth: '300px', height: '6px', background: 'var(--card-border)', borderRadius: '10px', marginTop: '20px', overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: 'var(--accent-gradient)', width: `${((loadingStep + 1) / 5) * 100}%`, transition: 'width 0.5s ease-out' }}></div>
+          </div>
+        </div>
+      ) : !resultados ? (
         <div className="form-wrapper slide-in-up">
           <h1>Planear Nuevo Viaje</h1>
           <p>Configura tu viaje y nuestra IA encontrará las mejores opciones.</p>

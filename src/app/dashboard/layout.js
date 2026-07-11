@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { Plane, LogOut, Map, History, User } from "lucide-react";
+import { Plane, LogOut, Map, History, User, Menu, X } from "lucide-react";
 import Link from "next/link";
 import "./dashboard.css";
 
@@ -11,6 +11,13 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -43,9 +50,28 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="dashboard-layout">
+      {/* Mobile Header (Only visible on small screens) */}
+      <div className="mobile-header">
+        <Link href="/" className="sidebar-logo" style={{ textDecoration: 'none', marginBottom: 0 }}>
+          <Plane className="logo-icon" color="var(--accent)" />
+          <span>TravelMate AI</span>
+        </Link>
+        <button 
+          className="mobile-menu-btn" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+      </div>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className="dashboard-sidebar">
-        <Link href="/" className="sidebar-logo" style={{ textDecoration: 'none' }}>
+      <aside className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+        <Link href="/" className="sidebar-logo desktop-logo" style={{ textDecoration: 'none' }}>
           <Plane className="logo-icon" color="var(--accent)" />
           <span>TravelMate AI</span>
         </Link>
