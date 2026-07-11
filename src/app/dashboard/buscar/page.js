@@ -17,19 +17,69 @@ const HOTEL_IMAGES = [
 const ATTRACTION_IMAGES = [
   "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80",
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80",
-  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=500&q=80",
   "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80"
+];
+
+const RESTAURANT_IMAGES = [
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=500&q=80"
 ];
 
 function BuscarViajeContent() {
   const searchParams = useSearchParams();
-  const [formData, setFormData] = useState({
-    destino: "",
-    fecha_inicio: "",
-    fecha_fin: "",
-    presupuesto: "",
-    personas: "1",
-    tipo_viaje: "ciudad",
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const origenParam = params.get("origen");
+      const destinoParam = params.get("destino");
+      const presupuestoParam = params.get("presupuesto");
+      const inicioParam = params.get("fecha_inicio");
+      const finParam = params.get("fecha_fin");
+
+      if (destinoParam || presupuestoParam || inicioParam || finParam) {
+        return {
+          origen: origenParam || "",
+          destino: destinoParam || "",
+          fecha_inicio: inicioParam || "",
+          fecha_fin: finParam || "",
+          presupuesto: presupuestoParam || "",
+          personas: "1",
+          tipo_viaje: "ciudad",
+        };
+      }
+
+      const cached = localStorage.getItem("travelmate_last_search");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.destino && parsed.presupuesto) {
+            localStorage.removeItem("travelmate_last_search");
+            return {
+              origen: parsed.origen || "",
+              destino: parsed.destino || "",
+              fecha_inicio: parsed.fecha_inicio || "",
+              fecha_fin: parsed.fecha_fin || "",
+              presupuesto: parsed.presupuesto || "",
+              personas: parsed.personas || "1",
+              tipo_viaje: parsed.tipo_viaje || "ciudad",
+            };
+          }
+        } catch (e) {
+          console.error("Error cargando búsqueda persistente:", e);
+        }
+      }
+    }
+    return {
+      origen: "",
+      destino: "",
+      fecha_inicio: "",
+      fecha_fin: "",
+      presupuesto: "",
+      personas: "1",
+      tipo_viaje: "ciudad",
+    };
   });
 
   const [loading, setLoading] = useState(false);
@@ -38,54 +88,6 @@ function BuscarViajeContent() {
   const [guardado, setGuardado] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [activeModalItem, setActiveModalItem] = useState(null);
-
-  // Leer parámetros de búsqueda al cargar de forma dinámica (incluyendo fechas y localStorage)
-  useEffect(() => {
-    const destinoParam = searchParams.get("destino");
-    const presupuestoParam = searchParams.get("presupuesto");
-    const inicioParam = searchParams.get("fecha_inicio");
-    const finParam = searchParams.get("fecha_fin");
-
-    if (destinoParam || presupuestoParam || inicioParam || finParam) {
-      const nuevoData = {
-        ...formData,
-        destino: destinoParam || "",
-        presupuesto: presupuestoParam || "",
-        fecha_inicio: inicioParam || "",
-        fecha_fin: finParam || ""
-      };
-      setFormData(nuevoData);
-
-      // Si vienen ambos parámetros obligatorios, ejecutar búsqueda automáticamente
-      if (destinoParam && presupuestoParam) {
-        ejecutarBusquedaAutomatica(nuevoData);
-      }
-    } else {
-      // Intentar recuperar de localStorage si no hay parámetros de búsqueda en la URL
-      const cached = localStorage.getItem("travelmate_last_search");
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (parsed.destino && parsed.presupuesto) {
-            const nuevoData = {
-              ...formData,
-              destino: parsed.destino || "",
-              presupuesto: parsed.presupuesto || "",
-              fecha_inicio: parsed.fecha_inicio || "",
-              fecha_fin: parsed.fecha_fin || "",
-            };
-            setFormData(nuevoData);
-            ejecutarBusquedaAutomatica(nuevoData);
-
-            // Limpiar localStorage una vez cargada para evitar bucles de ejecución
-            localStorage.removeItem("travelmate_last_search");
-          }
-        } catch (e) {
-          console.error("Error cargando búsqueda persistente:", e);
-        }
-      }
-    }
-  }, [searchParams]);
 
   const ejecutarBusquedaAutomatica = async (datos) => {
     setLoading(true);
@@ -119,6 +121,14 @@ function BuscarViajeContent() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (formData.destino && formData.presupuesto) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      ejecutarBusquedaAutomatica(formData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -201,17 +211,30 @@ function BuscarViajeContent() {
           {error && <div className="error-msg"><AlertCircle size={16} /> {error}</div>}
 
           <form onSubmit={handleSearch} className="trip-form">
-            <div className="form-group">
-              <label htmlFor="destino-input"><MapPin size={16} /> Destino</label>
-              <input
-                id="destino-input"
-                type="text"
-                name="destino"
-                placeholder="Ej. Kioto, Japón"
-                value={formData.destino}
-                onChange={handleInputChange}
-                required
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="origen-input"><MapPin size={16} /> Origen (Opcional)</label>
+                <input
+                  id="origen-input"
+                  type="text"
+                  name="origen"
+                  placeholder="Ej. Ciudad de México"
+                  value={formData.origen}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="destino-input"><MapPin size={16} /> Destino</label>
+                <input
+                  id="destino-input"
+                  type="text"
+                  name="destino"
+                  placeholder="Ej. Kioto, Japón"
+                  value={formData.destino}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-row">
@@ -431,6 +454,66 @@ function BuscarViajeContent() {
               ) : <p>No se encontraron atracciones destacadas.</p>}
             </div>
 
+            {/* Restaurantes */}
+            <div className="bento-card slide-in-up delay-2">
+              <h3>🍽️ Gastronomía / Dónde Comer</h3>
+              {resultados.restaurantes && resultados.restaurantes.length > 0 ? (
+                <div className="places-list">
+                  {resultados.restaurantes.map((r, i) => (
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      onClick={() => setActiveModalItem({
+                        type: 'restaurant',
+                        nombre: r.nombre,
+                        category: r.tipo || "Restaurante",
+                        imagen: RESTAURANT_IMAGES[i % RESTAURANT_IMAGES.length]
+                      })}
+                    >
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${RESTAURANT_IMAGES[i % RESTAURANT_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{r.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>{r.tipo || "Restaurante"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p>No se encontraron restaurantes en esta área.</p>}
+            </div>
+
+            {/* Vuelos */}
+            <div className="bento-card slide-in-up delay-3">
+              <h3>✈️ Opciones de Vuelos</h3>
+              {resultados.vuelos && resultados.vuelos.length > 0 ? (
+                <div className="places-list">
+                  {resultados.vuelos.map((v, i) => (
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      style={{ cursor: 'default' }}
+                    >
+                      <div className="place-details" style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="place-name" style={{ fontWeight: 800 }}>{v.aerolinea}</span>
+                          <span className="place-badge" style={{ backgroundColor: '#2f80ed', color: 'white' }}>{v.tipo}</span>
+                        </div>
+                        <div className="place-meta" style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.9rem' }}>
+                          <span><strong>Ruta:</strong> {v.ruta}</span>
+                          <span><strong>Duración:</strong> {v.duracion}</span>
+                          <span style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '1rem', marginTop: '4px' }}>Est. desde ${v.precio} USD</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p>No se encontraron opciones de vuelos recomendados.</p>}
+            </div>
+
             {/* Itinerario */}
             <div className="bento-card itinerary-card full-span slide-in-up delay-4">
               <h3>📅 Itinerario Sugerido</h3>
@@ -490,6 +573,10 @@ function BuscarViajeContent() {
                       Hospedaje Recomendado
                     </span>
                   </>
+                ) : activeModalItem.type === 'restaurant' ? (
+                  <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
+                    Restaurante / {activeModalItem.category || "Gastronomía"}
+                  </span>
                 ) : (
                   <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
                     {activeModalItem.category || "Atracción Turística"}
@@ -500,12 +587,14 @@ function BuscarViajeContent() {
               <p className="detail-modal-description">
                 {activeModalItem.type === 'hotel' 
                   ? `Este excelente hotel te ofrece una estancia cómoda con ubicaciones fantásticas, habitaciones bien equipadas y atención cálida. Disfruta del confort ideal mientras exploras tu destino.`
+                  : activeModalItem.type === 'restaurant'
+                  ? `Disfruta de la mejor gastronomía local en este increíble restaurante. Ofrece una variedad de platos preparados con ingredientes frescos y un ambiente acogedor para que disfrutes de tu comida.`
                   : `Uno de los atractivos imperdibles y más recomendados de este destino. Un lugar rico en historia, cultura y hermosas vistas para capturar los mejores momentos de tu viaje.`
                 }
               </p>
 
               <h3 className="detail-modal-section-title" style={{ color: 'var(--foreground)' }}>
-                {activeModalItem.type === 'hotel' ? "✨ Servicios del Hotel" : "💡 Información Clave"}
+                {activeModalItem.type === 'hotel' ? "✨ Servicios del Hotel" : activeModalItem.type === 'restaurant' ? "🍽️ Características" : "💡 Información Clave"}
               </h3>
 
               {activeModalItem.type === 'hotel' ? (
@@ -514,6 +603,13 @@ function BuscarViajeContent() {
                   <div className="detail-modal-feature-item">🏊 Piscina / Spa</div>
                   <div className="detail-modal-feature-item">🍳 Desayuno Completo</div>
                   <div className="detail-modal-feature-item">🏋️ Gimnasio</div>
+                </div>
+              ) : activeModalItem.type === 'restaurant' ? (
+                <div className="detail-modal-features">
+                  <div className="detail-modal-feature-item">🍷 Selección de Bebidas</div>
+                  <div className="detail-modal-feature-item">🌱 Opciones Vegetarianas</div>
+                  <div className="detail-modal-feature-item">🪑 Mesas al Aire Libre</div>
+                  <div className="detail-modal-feature-item">🧑‍🍳 Platillos Locales</div>
                 </div>
               ) : (
                 <div className="detail-modal-tips">

@@ -19,8 +19,14 @@ const HOTEL_IMAGES = [
 const ATTRACTION_IMAGES = [
   "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=500&q=80",
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80",
-  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=500&q=80",
   "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80"
+];
+
+const RESTAURANT_IMAGES = [
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=500&q=80"
 ];
 
 export default function Historial() {
@@ -28,10 +34,6 @@ export default function Historial() {
   const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [activeModalItem, setActiveModalItem] = useState(null);
-
-  useEffect(() => {
-    fetchHistorial();
-  }, []);
 
   const fetchHistorial = async () => {
     try {
@@ -59,6 +61,11 @@ export default function Historial() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchHistorial();
+  }, []);
 
   const formatearFecha = (fecha) => {
     if (!fecha) return "";
@@ -219,6 +226,66 @@ export default function Historial() {
               ) : <p>No se encontraron atracciones destacadas.</p>}
             </div>
 
+            {/* Restaurantes */}
+            <div className="bento-card">
+              <h3>🍽️ Gastronomía / Dónde Comer</h3>
+              {selectedTrip.resultados?.restaurantes && selectedTrip.resultados.restaurantes.length > 0 ? (
+                <div className="places-list">
+                  {selectedTrip.resultados.restaurantes.map((r, i) => (
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      onClick={() => setActiveModalItem({
+                        type: 'restaurant',
+                        nombre: r.nombre,
+                        category: r.tipo || "Restaurante",
+                        imagen: RESTAURANT_IMAGES[i % RESTAURANT_IMAGES.length]
+                      })}
+                    >
+                      <div 
+                        className="place-img" 
+                        style={{ backgroundImage: `url(${RESTAURANT_IMAGES[i % RESTAURANT_IMAGES.length]})` }}
+                      ></div>
+                      <div className="place-details">
+                        <span className="place-name">{r.nombre}</span>
+                        <div className="place-meta">
+                          <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>{r.tipo || "Restaurante"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p>No se encontraron restaurantes en esta área.</p>}
+            </div>
+
+            {/* Vuelos */}
+            <div className="bento-card">
+              <h3>✈️ Opciones de Vuelos</h3>
+              {selectedTrip.resultados?.vuelos && selectedTrip.resultados.vuelos.length > 0 ? (
+                <div className="places-list">
+                  {selectedTrip.resultados.vuelos.map((v, i) => (
+                    <div 
+                      key={i} 
+                      className="place-item-card"
+                      style={{ cursor: 'default' }}
+                    >
+                      <div className="place-details" style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="place-name" style={{ fontWeight: 800 }}>{v.aerolinea}</span>
+                          <span className="place-badge" style={{ backgroundColor: '#2f80ed', color: 'white' }}>{v.tipo}</span>
+                        </div>
+                        <div className="place-meta" style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.9rem' }}>
+                          <span><strong>Ruta:</strong> {v.ruta}</span>
+                          <span><strong>Duración:</strong> {v.duracion}</span>
+                          <span style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '1rem', marginTop: '4px' }}>Est. desde ${v.precio} USD</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p>No se encontraron opciones de vuelos recomendados.</p>}
+            </div>
+
             {/* Itinerario */}
             <div className="bento-card itinerary-card full-span">
               <h3>📅 Itinerario Sugerido</h3>
@@ -262,6 +329,10 @@ export default function Historial() {
                       Hospedaje Recomendado
                     </span>
                   </>
+                ) : activeModalItem.type === 'restaurant' ? (
+                  <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
+                    Restaurante / {activeModalItem.category || "Gastronomía"}
+                  </span>
                 ) : (
                   <span className="place-badge" style={{ background: 'var(--accent-gradient)', color: 'white' }}>
                     {activeModalItem.category || "Atracción Turística"}
@@ -272,12 +343,14 @@ export default function Historial() {
               <p className="detail-modal-description">
                 {activeModalItem.type === 'hotel' 
                   ? `Este excelente hotel te ofrece una estancia cómoda con ubicaciones fantásticas, habitaciones bien equipadas y atención cálida. Disfruta del confort ideal mientras exploras tu destino.`
+                  : activeModalItem.type === 'restaurant'
+                  ? `Disfruta de la mejor gastronomía local en este increíble restaurante. Ofrece una variedad de platos preparados con ingredientes frescos y un ambiente acogedor para que disfrutes de tu comida.`
                   : `Uno de los atractivos imperdibles y más recomendados de este destino. Un lugar rico en historia, cultura y hermosas vistas para capturar los mejores momentos de tu viaje.`
                 }
               </p>
 
               <h3 className="detail-modal-section-title" style={{ color: 'var(--foreground)' }}>
-                {activeModalItem.type === 'hotel' ? "✨ Servicios del Hotel" : "💡 Información Clave"}
+                {activeModalItem.type === 'hotel' ? "✨ Servicios del Hotel" : activeModalItem.type === 'restaurant' ? "🍽️ Características" : "💡 Información Clave"}
               </h3>
 
               {activeModalItem.type === 'hotel' ? (
@@ -286,6 +359,13 @@ export default function Historial() {
                   <div className="detail-modal-feature-item">🏊 Piscina / Spa</div>
                   <div className="detail-modal-feature-item">🍳 Desayuno Completo</div>
                   <div className="detail-modal-feature-item">🏋️ Gimnasio</div>
+                </div>
+              ) : activeModalItem.type === 'restaurant' ? (
+                <div className="detail-modal-features">
+                  <div className="detail-modal-feature-item">🍷 Selección de Bebidas</div>
+                  <div className="detail-modal-feature-item">🌱 Opciones Vegetarianas</div>
+                  <div className="detail-modal-feature-item">🪑 Mesas al Aire Libre</div>
+                  <div className="detail-modal-feature-item">🧑‍🍳 Platillos Locales</div>
                 </div>
               ) : (
                 <div className="detail-modal-tips">

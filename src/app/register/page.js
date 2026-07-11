@@ -20,25 +20,24 @@ function RegisterContent() {
   const [loading, setLoading] = useState(false);
 
   // Capturar parámetros de la Landing Page
-  const [redirectQuery, setRedirectQuery] = useState("");
+  const [redirectQuery] = useState(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams();
+      const destino = searchParams.get("destino");
+      const presupuesto = searchParams.get("presupuesto");
+      const fecha_inicio = searchParams.get("fecha_inicio");
+      const fecha_fin = searchParams.get("fecha_fin");
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    const destino = searchParams.get("destino");
-    const presupuesto = searchParams.get("presupuesto");
-    const fecha_inicio = searchParams.get("fecha_inicio");
-    const fecha_fin = searchParams.get("fecha_fin");
+      if (destino) params.append("destino", destino);
+      if (presupuesto) params.append("presupuesto", presupuesto);
+      if (fecha_inicio) params.append("fecha_inicio", fecha_inicio);
+      if (fecha_fin) params.append("fecha_fin", fecha_fin);
 
-    if (destino) params.append("destino", destino);
-    if (presupuesto) params.append("presupuesto", presupuesto);
-    if (fecha_inicio) params.append("fecha_inicio", fecha_inicio);
-    if (fecha_fin) params.append("fecha_fin", fecha_fin);
-
-    const queryStr = params.toString();
-    if (queryStr) {
-      setRedirectQuery(queryStr);
+      return params.toString();
     }
-  }, [searchParams]);
+    return "";
+  });
 
   const handleRegister = async (e) => {
     e.preventDefault();
