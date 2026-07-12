@@ -205,7 +205,7 @@ export default function Home() {
       <nav className="navbar container fade-in-down">
         <div className="logo">
           <Plane className="logo-icon animate-bounce" />
-          <span>TravelMate AI</span>
+          <span className="logo-text">TravelMate AI</span>
         </div>
         <div className="auth-links">
           {session ? (
@@ -221,16 +221,16 @@ export default function Home() {
 
       <header className="hero">
         <div className="hero-content">
-          <span className="badge-premium slide-in-up delay-1">✨ Planifica tus vacaciones ideales</span>
-          <h1 className="slide-in-up delay-2">Encuentra tu próximo viaje</h1>
-          <p className="slide-in-up delay-3">Dinos tu presupuesto y generaremos un itinerario con hoteles, clima y atracciones en segundos.</p>
+          <span className="badge-premium slide-in-up delay-1 hero-badge">✨ Planifica tus vacaciones ideales</span>
+          <h1 className="slide-in-up delay-2 hero-title">Encuentra tu próximo viaje</h1>
+          <p className="slide-in-up delay-3 hero-desc">Dinos tu presupuesto y generaremos un itinerario con hoteles, clima y atracciones en segundos.</p>
           
           {loading ? (
-            <div className="search-widget glass-card" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: '10px 24px 10px 24px', width: '100%', maxWidth: '980px', margin: '0 auto', minHeight: '82px', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0, 166, 153, 0.08)', borderRadius: '50%', width: '44px', height: '44px', flexShrink: 0 }}>
+            <div className="search-widget glass-card loading-widget" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: '10px 24px', width: '100%', maxWidth: '980px', margin: '0 auto', minHeight: '82px', gap: '20px' }}>
+              <div className="loading-plane-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0, 166, 153, 0.08)', borderRadius: '50%', width: '44px', height: '44px', flexShrink: 0 }}>
                 <Plane size={20} color="var(--accent)" style={{ animation: 'fly-spin 3s linear infinite' }} />
               </div>
-              <div style={{ textAlign: 'left' }}>
+              <div className="loading-text-container" style={{ textAlign: 'left' }}>
                 <h2 style={{ fontSize: '1rem', margin: 0, fontWeight: '800', color: 'var(--foreground)' }}>Preparando la magia...</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '2px 0 0 0', transition: 'all 0.3s' }}>
                   {loadingMessages[loadingStep]}
