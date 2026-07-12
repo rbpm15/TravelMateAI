@@ -64,6 +64,28 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [resultados, setResultados] = useState(null);
   const [error, setError] = useState(null);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % 5);
+      }, 2500);
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoadingStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  const loadingMessages = [
+    "Contactando a nuestra IA de viajes...",
+    "Buscando las mejores rutas de vuelo...",
+    "Analizando opciones de alojamiento reales...",
+    "Descubriendo restaurantes y atracciones locales...",
+    "Armando tu itinerario personalizado..."
+  ];
 
   useEffect(() => {
     // Verificar sesión
@@ -203,62 +225,75 @@ export default function Home() {
           <h1 className="slide-in-up delay-2">Encuentra tu próximo viaje</h1>
           <p className="slide-in-up delay-3">Dinos tu presupuesto y generaremos un itinerario con hoteles, clima y atracciones en segundos.</p>
           
-          <form className="search-widget glass-card slide-in-up delay-4" onSubmit={handleBuscar}>
-            <div className="search-input">
-              <label htmlFor="destino-input"><Map size={16} /> Destino</label>
-              <input 
-                id="destino-input"
-                type="text" 
-                placeholder="¿A dónde quieres ir?" 
-                value={destino}
-                onChange={(e) => setDestino(e.target.value)}
-                required
-              />
+          {loading ? (
+            <div className="search-widget glass-card" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: '10px 24px 10px 24px', width: '100%', maxWidth: '980px', margin: '0 auto', minHeight: '82px', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0, 166, 153, 0.08)', borderRadius: '50%', width: '44px', height: '44px', flexShrink: 0 }}>
+                <Plane size={20} color="var(--accent)" style={{ animation: 'fly-spin 3s linear infinite' }} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <h2 style={{ fontSize: '1rem', margin: 0, fontWeight: '800', color: 'var(--foreground)' }}>Preparando la magia...</h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '2px 0 0 0', transition: 'all 0.3s' }}>
+                  {loadingMessages[loadingStep]}
+                </p>
+              </div>
             </div>
-            
-            <div className="search-input">
-              <label htmlFor="inicio-input"><Calendar size={16} /> Ida</label>
-              <input 
-                id="inicio-input"
-                type="date" 
-                value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
-                required
-              />
-            </div>
+          ) : (
+            <form className="search-widget glass-card slide-in-up delay-4" onSubmit={handleBuscar}>
+              <div className="search-input">
+                <label htmlFor="destino-input"><Map size={16} /> Destino</label>
+                <input 
+                  id="destino-input"
+                  type="text" 
+                  placeholder="¿A dónde quieres ir?" 
+                  value={destino}
+                  onChange={(e) => setDestino(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="search-input">
+                <label htmlFor="inicio-input"><Calendar size={16} /> Ida</label>
+                <input 
+                  id="inicio-input"
+                  type="date" 
+                  value={fechaInicio}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                  required
+                />
+              </div>
 
-            <div className="search-input">
-              <label htmlFor="fin-input"><Calendar size={16} /> Regreso</label>
-              <input 
-                id="fin-input"
-                type="date" 
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-                required
-              />
-            </div>
+              <div className="search-input">
+                <label htmlFor="fin-input"><Calendar size={16} /> Regreso</label>
+                <input 
+                  id="fin-input"
+                  type="date" 
+                  value={fechaFin}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                  required
+                />
+              </div>
 
-            <div className="search-input">
-              <label htmlFor="presupuesto-input"><Wallet size={16} /> Presupuesto</label>
-              <input 
-                id="presupuesto-input"
-                type="number" 
-                placeholder="$ USD" 
-                value={presupuesto}
-                onChange={(e) => setPresupuesto(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit" className="search-btn btn-primary">Buscar</button>
-          </form>
+              <div className="search-input">
+                <label htmlFor="presupuesto-input"><Wallet size={16} /> Presupuesto</label>
+                <input 
+                  id="presupuesto-input"
+                  type="number" 
+                  placeholder="$ USD" 
+                  value={presupuesto}
+                  onChange={(e) => setPresupuesto(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="search-btn btn-primary">Buscar</button>
+            </form>
+          )}
         </div>
       </header>
 
-      {/* Indicador de carga o error para el buscador */}
-      {(loading || error) && (
+      {/* Indicador de error para el buscador */}
+      {error && !loading && (
         <div className="search-status-container container">
-          {loading && <div className="loading-indicator animate-pulse">✨ Analizando destinos, clima y atracciones para ti...</div>}
-          {error && <div className="error-msg">⚠️ {error}</div>}
+          <div className="error-msg" style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>⚠️ {error}</div>
         </div>
       )}
 

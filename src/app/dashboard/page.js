@@ -7,12 +7,22 @@ import Link from "next/link";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const [dates, setDates] = useState({ inicio: "", fin: "" });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser(session.user);
       }
+    });
+
+    const hoy = new Date();
+    const futura = new Date();
+    futura.setDate(hoy.getDate() + 7);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDates({
+      inicio: hoy.toISOString().split('T')[0],
+      fin: futura.toISOString().split('T')[0]
     });
   }, []);
 
@@ -37,20 +47,31 @@ export default function Dashboard() {
         <div className="dashboard-card">
           <h2><Star size={20} color="var(--accent)" style={{marginRight: 8, display: 'inline-block', verticalAlign: 'middle'}}/> Recomendados para ti</h2>
           <div className="recommended-list">
-            <div className="recommended-item">
-              <div className="rec-img" style={{backgroundImage: "url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=400')"}}></div>
-              <div className="rec-info">
-                <h4>Bali, Indonesia</h4>
-                <p>Desde $1,200 USD</p>
+            <Link 
+              href={`/dashboard/buscar?destino=${encodeURIComponent("Bali, Indonesia")}&presupuesto=1200&fecha_inicio=${dates.inicio}&fecha_fin=${dates.fin}&tipo_viaje=aventura`}
+              style={{textDecoration: 'none', color: 'inherit'}}
+            >
+              <div className="recommended-item">
+                <div className="rec-img" style={{backgroundImage: "url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=400')"}}></div>
+                <div className="rec-info">
+                  <h4>Bali, Indonesia</h4>
+                  <p>Desde $1,200 USD</p>
+                </div>
               </div>
-            </div>
-            <div className="recommended-item">
-              <div className="rec-img" style={{backgroundImage: "url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=400')"}}></div>
-              <div className="rec-info">
-                <h4>París, Francia</h4>
-                <p>Desde $1,500 USD</p>
+            </Link>
+
+            <Link 
+              href={`/dashboard/buscar?destino=${encodeURIComponent("París, Francia")}&presupuesto=1500&fecha_inicio=${dates.inicio}&fecha_fin=${dates.fin}&tipo_viaje=ciudad`}
+              style={{textDecoration: 'none', color: 'inherit'}}
+            >
+              <div className="recommended-item">
+                <div className="rec-img" style={{backgroundImage: "url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=400')"}}></div>
+                <div className="rec-info">
+                  <h4>París, Francia</h4>
+                  <p>Desde $1,500 USD</p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
         

@@ -14,6 +14,7 @@ function RegisterContent() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [origen, setOrigen] = useState("");
   
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -51,6 +52,7 @@ function RegisterContent() {
       options: {
         data: {
           full_name: name,
+          origen: origen
         }
       }
     });
@@ -97,6 +99,18 @@ function RegisterContent() {
               onChange={(e) => setName(e.target.value)}
               required 
               autoComplete="name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="origen-input">Tu Ciudad (Origen)</label>
+            <input 
+              id="origen-input"
+              type="text" 
+              placeholder="Ej. Ciudad de México" 
+              value={origen}
+              onChange={(e) => setOrigen(e.target.value)}
+              required
             />
           </div>
 

@@ -128,6 +128,14 @@ function BuscarViajeContent() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       ejecutarBusquedaAutomatica(formData);
     }
+    
+    const fetchOrigin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.user_metadata?.origen) {
+        setFormData(prev => prev.origen ? prev : { ...prev, origen: session.user.user_metadata.origen });
+      }
+    };
+    fetchOrigin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
